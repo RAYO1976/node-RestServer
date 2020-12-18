@@ -16,9 +16,23 @@ const Usuario = require('../models/usuario');
 //inicializa o carga express
 const app = express()
 
-app.get('/usuarios', function(req, res) {
-    //res.send('Hello World')
-    //res.json('get Usuario');
+//con función middleware para validar token
+const { verificaToken, verificaRole } = require('../middlewares/autenticacion');
+
+
+app.get('/usuarios', verificaToken, (req, res) => {
+
+
+    return res.json({
+            //aquí imprimo todo el objeto
+            usuario: req.usuario,
+            //aquí solo el nombre
+            nombre: req.usuario.nombre,
+            email: req.usuario.email
+        })
+        //app.get('/usuarios', function(req, res) {
+        //res.send('Hello World')
+        //res.json('get Usuario');
 
     //va a retornar TODOS los usuarios
     //.find({<condicion})
@@ -62,8 +76,10 @@ app.get('/usuarios', function(req, res) {
         })
 });
 //EL POST se suele usar para grabar un usuario
+//El POST vemos que invoca a 2 middlewares (verificaToken y verificaRole)
+app.post('/usuario', [verificaToken, verificaRole], (req, res) => {
 
-app.post('/usuario', function(req, res) {
+    //app.post('/usuario', function(req, res) {
     //res.send('Hello World')
 
     //este body ya vendrá parseado por body-parser.
@@ -124,13 +140,18 @@ app.post('/usuario', function(req, res) {
 /* ../put/<id_usuario> */
 //app.put('usuario/:id') --> : para indicar el parámetro
 
-app.put('/usuario/:id', function(req, res) {
+
+
+app.put('/usuario/:id', verificaToken, (req, res) => {
+
+    //app.put('/usuario/:id', function(req, res) {
     //res.send('Hello World')
     //para recuperar el id que viene como parámetro
     let id = req.params.id;
     //aquí le decimos que de todos los campos NO ACTUALICE el de password
     //delete body.password
     //let body = req.body;
+    console.log(id);
 
     //vamos a indicar con pick TODAS las propiedades que si se podrán actualizar del objeto
     let body = _.pick(req.body, ['nombre', 'email', 'img', 'role', 'estado']);
@@ -142,6 +163,7 @@ app.put('/usuario/:id', function(req, res) {
     Usuario.findByIdAndUpdate(id, body, { new: true, runValidators: true }, (err, usuarioDB) => {
         if (err) {
             return res.status(400).json({
+                usuario: usuarioDB,
                 status: false,
                 err
             });
@@ -153,7 +175,10 @@ app.put('/usuario/:id', function(req, res) {
     })
 })
 
-app.delete('/usuario/:id', function(req, res) {
+
+app.delete('/usuario/:id', verificaToken, (req, res) => {
+
+    /* app.delete('/usuario/:id', function(req, res) { */
     //res.send('Hello World')
     //res.json('DELETE usuario');
 

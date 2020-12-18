@@ -1,7 +1,6 @@
 //se está imporando el fichero de configuración y ejecutando lo que tiene
 require('./config/config.js');
 
-require('./routes/usuario.js');
 
 const express = require('express')
 
@@ -18,8 +17,16 @@ const app = express()
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
 
-//se le indican a express las RUTAS que se van a usar.
+/* //se le indican a express las RUTAS que se van a usar.
 app.use(require('./routes/usuario'));
+
+//le indicamos tambien las rutas que hemos indicado en el fichero login.js para que funcionen las peticiones /login
+app.use(require('./routes/login'));
+ */
+
+
+//===CONFIGURACIÓN GLOBAL DE RUTAS
+app.use(require('./routes/index'));
 
 // parse application/json
 app.use(bodyParser.json())
